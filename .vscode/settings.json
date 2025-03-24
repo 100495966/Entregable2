@@ -1,0 +1,12 @@
+{
+    "files.associations": {
+        "mqueue.h": "c",
+        "pthread.h": "c",
+        "stat.h": "c",
+        "string.h": "c",
+        "stdlib.h": "c",
+        "stdio.h": "c",
+        "unistd.h": "c",
+        "claves.h": "c"
+    }
+}
