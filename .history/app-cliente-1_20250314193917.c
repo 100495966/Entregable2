@@ -76,8 +76,8 @@ int main() {
     int N_value2;
     double V_value2[32];
     struct Coord value3;
-    
-    if (get_value(42, value1, &N_value2, V_value2, &value3) == 0) {
+
+    if ((get_value(42, value1, &N_value2, V_value2, &value3)) == 0) {
         printf("Cliente1: Valores obtenidos correctamente:\n");
         printf("    value1: %s\n", value1);
         printf("    N_value2: %d\n", N_value2);
@@ -98,7 +98,7 @@ int main() {
     } else {
         printf("Cliente1: Error al modificar la clave 42.\n");
     }
-    
+
     // Obtener los valores modificados
     printf("\nCliente1: Obteniendo valores modificados de la clave 42...\n");
     if (get_value(42, value1, &N_value2, V_value2, &value3) == 0) {

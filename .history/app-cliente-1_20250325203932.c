@@ -76,8 +76,8 @@ int main() {
     int N_value2;
     double V_value2[32];
     struct Coord value3;
-    
-    if (get_value(42, value1, &N_value2, V_value2, &value3) == 0) {
+    int ret;
+    if ((ret=(get_value(42, value1, &N_value2, V_value2, &value3))) == 0) {
         printf("Cliente1: Valores obtenidos correctamente:\n");
         printf("    value1: %s\n", value1);
         printf("    N_value2: %d\n", N_value2);
@@ -85,6 +85,7 @@ int main() {
         print_vector(V_value2, N_value2);
         printf("    value3: (%d, %d)\n", value3.x, value3.y);
     } else {
+        printf("%d", ret);
         printf("Cliente1: Error al obtener la clave 42.\n");
     }
     

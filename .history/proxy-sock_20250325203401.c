@@ -13,7 +13,7 @@ int connectToServer(int * s){
         return ERROR_COMMUNICATION;
     }
 
-    //printf("CLIENTE: Conectando a IP: %s, Puerto: %s\n", ip_tuplas, port_tuplas);
+    printf("CLIENTE: Conectando a IP: %s, Puerto: %s\n", ip_tuplas, port_tuplas);
     
     struct sockaddr_in server_addr;
     struct hostent * hp;
@@ -60,7 +60,7 @@ static int sendRequestToServer(
         return ERROR_COMMUNICATION;
     }
     
-    //printf("CLIENTE: conexión exitosa con el servidor\n");
+    printf("CLIENTE: conexión exitosa con el servidor\n");
 
     // Enviar acción a realizar
     if ((ret = sendMessage(sc, &action, 1)) != 0) goto cleanup;
@@ -172,39 +172,34 @@ int get_value(int key, char *value1, int *N_value2, double *V_value2, struct Coo
     snprintf(buffer, sizeof(buffer), "%d", key);
     if ((ret = sendMessage(s, buffer, strlen(buffer) + 1)) != 0) goto cleanup_get_value;
     
-    int result;
-
     // Leer el resultado
-    if ((ret = read_num_from_socket(s, buffer, &result)) != 0) goto cleanup_get_value;
+    if ((ret = read_num_from_socket(s, buffer, &ret)) != 0) goto cleanup_get_value;
     
-    ret = result;
-
     // Si es correcto, obtener los datos
-    if (result == 0) {
-
+    if (ret == 0) {
         // Read value1
-        if ((ret = readLine(s, value1, 256)) < 0) goto cleanup_get_value;
+        if ((ret = readLine(s, value1, 256)) != 0) goto cleanup_get_value;
         
         // Read N_value2
         if ((ret = read_num_from_socket(s, buffer, N_value2)) != 0) goto cleanup_get_value;
         
         // Read V_value2 array elements
         for (int i = 0; i < *N_value2; i++) {
-            if ((ret = readLine(s, buffer, 256)) < 0) {
+            if ((ret = readLine(s, buffer, 256)) != 0) {
                 close(s);
                 return ERROR_COMMUNICATION;
             }
             if ((ret = strtod_handling(buffer, &V_value2[i])) != 0) goto cleanup_get_value;
         }
-
+        
         // Read value3.x
         if ((ret = read_num_from_socket(s, buffer, &(value3->x))) != 0) goto cleanup_get_value;
-
-
+        
         // Read value3.y
         if ((ret = read_num_from_socket(s, buffer, &(value3->y))) != 0) goto cleanup_get_value;
-
     }
+
+    ret = 0;
     
     cleanup_get_value:
         close(s);

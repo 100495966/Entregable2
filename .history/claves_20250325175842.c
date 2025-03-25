@@ -69,7 +69,6 @@ int exist(int key){
         current = current->next;
     }
     pthread_mutex_unlock(&mutex1);
-        fflush(stdout);
     return 0;
 }
 

@@ -1,8 +1,6 @@
 #ifndef CLAVES_H
 #define CLAVES_H
 
-#include "includes_y_defines.h"
-
 //Definir estructuras
 struct Coord {
    int x ;

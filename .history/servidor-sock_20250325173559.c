@@ -1,5 +1,4 @@
 #include "claves.h"
-#include "servidor_y_proxy.h"
 
 //Definir mutex, variable condicional y variable global de sincronización 'busy'
 pthread_mutex_t mutex2;
@@ -18,11 +17,6 @@ void * SendResponse(void * sc){
     char action;
     char buffer[256];
     int ret;
-    int key;
-    char * value1;
-    int N_value2;
-    double * V_value2;
-    struct Coord value3;
 
     // Recibir la acción a realizar
     if ((ret = recvMessage(s_local, &action, 1)) != 0){
@@ -30,7 +24,7 @@ void * SendResponse(void * sc){
         pthread_exit(&ret);
     }
 
-    printf("SERVIDOR: Solicitud recibida: Acción %c \n", action);
+    printf("Solicitud recibida: Acción %c \n", action);
 
     // Procesar la solicitud
     switch (action) {
@@ -40,6 +34,7 @@ void * SendResponse(void * sc){
         case DELETE_KEY:
         case EXIST:
         case GET_VALUE:
+            int key;
             // Recibir la key
             if ((ret = read_num_from_socket(s_local, buffer, &key)) != 0) goto cleanup;
             switch (action){
@@ -50,50 +45,54 @@ void * SendResponse(void * sc){
                     ret = exist(key);
                     break;
                 case GET_VALUE:
-                    char value1[256];
-                    double V_value2[32];
+                    char * value1[256];
+                    int N_value2;
+                    double * V_value2;
+                    struct Coord value3;
                     ret = get_value(key, value1, &N_value2, V_value2, &value3);
                     
-                    int ret_copy = ret;
-
                     // Enviar el resultado
                     snprintf(buffer, sizeof(buffer), "%d", ret);
                     if ((ret = sendMessage(s_local, buffer, strlen(buffer) + 1)) != 0) goto cleanup;
-
-                    if (ret_copy == 0){
-                        // Enviar value1
-                        if ((ret = sendMessage(s_local, value1, strlen(value1) + 1)) != 0) goto cleanup;
-
-                        // Enviar número de doubles contenidos en value2
-                        snprintf(buffer, sizeof(buffer), "%d", N_value2);
-                        if ((ret = sendMessage(s_local, buffer, strlen(buffer) + 1)) != 0) goto cleanup;
                         
-                        // Enviar cada elemento de value2
-                        for (int i = 0; i < N_value2; i++) {
-                            snprintf(buffer, sizeof(buffer), "%f", V_value2[i]);
-                            if ((ret = sendMessage(s_local, buffer, strlen(buffer) + 1)) != 0) {
-                                goto cleanup;
-                            }
+                    // Enviar value1
+                    if ((ret = sendMessage(s_local, value1, strlen(value1) + 1)) != 0) goto cleanup;
+                    
+                    // Enviar número de doubles contenidos en value2
+                    snprintf(buffer, sizeof(buffer), "%d", N_value2);
+                    if ((ret = sendMessage(s_local, buffer, strlen(buffer) + 1)) != 0) goto cleanup;
+                    
+                    // Enviar cada elemento de value2
+                    for (int i = 0; i < N_value2; i++) {
+                        snprintf(buffer, sizeof(buffer), "%f", V_value2[i]);
+                        if ((ret = sendMessage(s_local, buffer, strlen(buffer) + 1)) != 0) {
+                            goto cleanup;
                         }
-                        
-                        // Enviar value3.x
-                        snprintf(buffer, sizeof(buffer), "%d", value3.x);
-                        if ((ret = sendMessage(s_local, buffer, strlen(buffer) + 1)) != 0) goto cleanup;
-                        
-                        // Enviar value3.y
-                        snprintf(buffer, sizeof(buffer), "%d", value3.y);
-                        if ((ret = sendMessage(s_local, buffer, strlen(buffer) + 1)) != 0) goto cleanup;
                     }
+                    
+                    // Enviar value3.x
+                    snprintf(buffer, sizeof(buffer), "%d", value3.x);
+                    if ((ret = sendMessage(s_local, buffer, strlen(buffer) + 1)) != 0) goto cleanup;
+                    
+                    // Enviar value3.y
+                    snprintf(buffer, sizeof(buffer), "%d", value3.y);
+                    if ((ret = sendMessage(s_local, buffer, strlen(buffer) + 1)) != 0) goto cleanup;
                     break;
             }
             break;
         case SET_VALUE:
         case MODIFY_VALUE:
+            int key;
+            char * value1;
+            int N_value2;
+            double * V_value2;
+            struct Coord value3;
+
             // Recibir la key
             if ((ret = read_num_from_socket(s_local, buffer, &key)) != 0) goto cleanup;
 
             // Recibir value1
-            if ((ret = readLine(s_local, buffer, 256)) < 0)  goto cleanup;
+            if ((ret = readLine(s_local, buffer, 256)) != 0)  goto cleanup;
             if ((value1 = (char *) malloc(strlen(buffer) + 1)) == NULL)  goto cleanup;
             strcpy(value1, buffer);
 
@@ -103,7 +102,7 @@ void * SendResponse(void * sc){
             // Recibir double a double de value2
             if ((V_value2 = (double *) malloc(N_value2 * sizeof(double))) == NULL)  goto cleanup;
             for (int i = 0; i < N_value2; i++){
-                if ((ret = readLine(s_local, buffer, 256)) < 0){
+                if ((ret = readLine(s_local, buffer, 256)) != 0){
                     goto cleanup;
                 }
                 if ((ret = strtod_handling(buffer, &V_value2[i])) != 0){
@@ -139,6 +138,7 @@ void * SendResponse(void * sc){
         if (value1 == NULL) free(value1);
         if (V_value2 == NULL) free(V_value2);
         close(s_local);
+        perror("SERVIDOR: un hilo encontró un error");
         pthread_exit(&ret);
 }
 

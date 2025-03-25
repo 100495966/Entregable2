@@ -62,7 +62,7 @@ int main() {
     double vec2[2] = {99.9, 88.8};
 
     if (modify_value(41, "ModificaciónExterna", 2, vec2, coord2) == 0) {
-        printf("Cliente2: Clave 41 modificada correctamente.\n");
+        printf(" Clave 41 modificada correctamente.\n");
     } else {
         printf("Cliente2: Error al modificar la clave 41.\n");
     }
@@ -70,14 +70,14 @@ int main() {
     // Obtener los valores modificados
     printf("\nCliente2: Obteniendo valores modificados de la clave 41...\n");
     if (get_value(41, value1, &N_value2, V_value2, &value3) == 0) {
-        printf("Cliente2: Valores obtenidos correctamente:\n");
+        printf("Valores obtenidos correctamente:\n");
         printf("   🔹 value1: %s\n", value1);
         printf("   🔹 N_value2: %d\n", N_value2);
         printf("   🔹 V_value2: ");
         print_vector(V_value2, N_value2);
         printf("   🔹 value3: (%d, %d)\n", value3.x, value3.y);
     } else {
-        printf("Cliente2: Error al obtener la clave 41.\n");
+        printf(" Error al obtener la clave 41.\n");
     }
 
     // Eliminar la clave creada por otro cliente

@@ -12,8 +12,6 @@ int connectToServer(int * s){
         perror("Variable de entorno \"PORT_TUPLAS\" no ha sido definida\n");
         return ERROR_COMMUNICATION;
     }
-
-    //printf("CLIENTE: Conectando a IP: %s, Puerto: %s\n", ip_tuplas, port_tuplas);
     
     struct sockaddr_in server_addr;
     struct hostent * hp;
@@ -26,12 +24,10 @@ int connectToServer(int * s){
     memset((char *)&server_addr, 0, sizeof(server_addr));
     server_addr.sin_family = AF_INET;
     server_addr.sin_port = htons(atoi(port_tuplas));
-    if ((hp = gethostbyname(ip_tuplas)) == NULL) {
-        perror("CLIENTE: Error al resolver el nombre de host");
-        close(*s);
-        return ERROR_COMMUNICATION;
-    }
-    memcpy(&server_addr.sin_addr, hp->h_addr_list[0], hp->h_length);
+    hp = gethostbyname(ip_tuplas); 
+    memcpy(&server_addr.sin_addr, hp->h_addr_list, hp->h_length);
+
+    printf("alo");
 
     if (connect(*s, (struct sockaddr *) &server_addr, sizeof(server_addr)) != 0){
         perror("CLIENTE: Error al establecer conexión con el servidor");
@@ -60,7 +56,7 @@ static int sendRequestToServer(
         return ERROR_COMMUNICATION;
     }
     
-    //printf("CLIENTE: conexión exitosa con el servidor\n");
+    printf("CLIENTE: conexión exitosa con el servidor");
 
     // Enviar acción a realizar
     if ((ret = sendMessage(sc, &action, 1)) != 0) goto cleanup;
@@ -99,9 +95,10 @@ static int sendRequestToServer(
     }
 
     // Recibir la respuesta
-    if ((ret = recvMessage(sc, buffer, 2)) != 0) goto cleanup;
-    if ((strtol_handling(buffer, &ret)) != 0) goto cleanup;
+    if ((ret = recvMessage(sc, buffer, 1)) != 0) goto cleanup;
 
+    if ((strtol_handling(buffer, &ret)) != 0) goto cleanup;
+    
     cleanup:
         // Cerrar y eliminar el socket
         close(sc);
@@ -164,47 +161,42 @@ int get_value(int key, char *value1, int *N_value2, double *V_value2, struct Coo
     }
     
     // Enviar acción a realizar
-    char action = GET_VALUE;
-    snprintf(buffer, sizeof(buffer), "%c", action);
-    if ((ret = sendMessage(s, &action, 1)) != 0) goto cleanup_get_value;
+    int action = GET_VALUE;
+    snprintf(buffer, sizeof(buffer), "%d", action);
+    if ((ret = sendMessage(s, buffer, strlen(buffer) + 1)) != 0) goto cleanup_get_value;
     
     // Enviar key
     snprintf(buffer, sizeof(buffer), "%d", key);
     if ((ret = sendMessage(s, buffer, strlen(buffer) + 1)) != 0) goto cleanup_get_value;
     
-    int result;
-
     // Leer el resultado
-    if ((ret = read_num_from_socket(s, buffer, &result)) != 0) goto cleanup_get_value;
+    if ((ret = read_num_from_socket(s, buffer, &ret)) != 0) goto cleanup_get_value;
     
-    ret = result;
-
     // Si es correcto, obtener los datos
-    if (result == 0) {
-
+    if (ret == 0) {
         // Read value1
-        if ((ret = readLine(s, value1, 256)) < 0) goto cleanup_get_value;
+        if ((ret = readLine(s, value1, 256)) != 0) goto cleanup_get_value;
         
         // Read N_value2
         if ((ret = read_num_from_socket(s, buffer, N_value2)) != 0) goto cleanup_get_value;
         
         // Read V_value2 array elements
         for (int i = 0; i < *N_value2; i++) {
-            if ((ret = readLine(s, buffer, 256)) < 0) {
+            if ((ret = readLine(s, buffer, 256)) != 0) {
                 close(s);
                 return ERROR_COMMUNICATION;
             }
             if ((ret = strtod_handling(buffer, &V_value2[i])) != 0) goto cleanup_get_value;
         }
-
+        
         // Read value3.x
         if ((ret = read_num_from_socket(s, buffer, &(value3->x))) != 0) goto cleanup_get_value;
-
-
+        
         // Read value3.y
         if ((ret = read_num_from_socket(s, buffer, &(value3->y))) != 0) goto cleanup_get_value;
-
     }
+
+    ret = 0;
     
     cleanup_get_value:
         close(s);

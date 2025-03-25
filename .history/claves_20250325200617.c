@@ -69,6 +69,8 @@ int exist(int key){
         current = current->next;
     }
     pthread_mutex_unlock(&mutex1);
+        //FIXME
+        printf("no42\n");
         fflush(stdout);
     return 0;
 }

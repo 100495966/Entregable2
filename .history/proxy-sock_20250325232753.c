@@ -172,15 +172,11 @@ int get_value(int key, char *value1, int *N_value2, double *V_value2, struct Coo
     snprintf(buffer, sizeof(buffer), "%d", key);
     if ((ret = sendMessage(s, buffer, strlen(buffer) + 1)) != 0) goto cleanup_get_value;
     
-    int result;
-
     // Leer el resultado
-    if ((ret = read_num_from_socket(s, buffer, &result)) != 0) goto cleanup_get_value;
+    if ((ret = read_num_from_socket(s, buffer, &ret)) != 0) goto cleanup_get_value;
     
-    ret = result;
-
     // Si es correcto, obtener los datos
-    if (result == 0) {
+    if (ret == 0) {
 
         // Read value1
         if ((ret = readLine(s, value1, 256)) < 0) goto cleanup_get_value;

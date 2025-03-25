@@ -54,36 +54,32 @@ void * SendResponse(void * sc){
                     double V_value2[32];
                     ret = get_value(key, value1, &N_value2, V_value2, &value3);
                     
-                    int ret_copy = ret;
-
                     // Enviar el resultado
                     snprintf(buffer, sizeof(buffer), "%d", ret);
                     if ((ret = sendMessage(s_local, buffer, strlen(buffer) + 1)) != 0) goto cleanup;
 
-                    if (ret_copy == 0){
-                        // Enviar value1
-                        if ((ret = sendMessage(s_local, value1, strlen(value1) + 1)) != 0) goto cleanup;
+                    // Enviar value1
+                    if ((ret = sendMessage(s_local, value1, strlen(value1) + 1)) != 0) goto cleanup;
 
-                        // Enviar número de doubles contenidos en value2
-                        snprintf(buffer, sizeof(buffer), "%d", N_value2);
-                        if ((ret = sendMessage(s_local, buffer, strlen(buffer) + 1)) != 0) goto cleanup;
-                        
-                        // Enviar cada elemento de value2
-                        for (int i = 0; i < N_value2; i++) {
-                            snprintf(buffer, sizeof(buffer), "%f", V_value2[i]);
-                            if ((ret = sendMessage(s_local, buffer, strlen(buffer) + 1)) != 0) {
-                                goto cleanup;
-                            }
+                    // Enviar número de doubles contenidos en value2
+                    snprintf(buffer, sizeof(buffer), "%d", N_value2);
+                    if ((ret = sendMessage(s_local, buffer, strlen(buffer) + 1)) != 0) goto cleanup;
+                    
+                    // Enviar cada elemento de value2
+                    for (int i = 0; i < N_value2; i++) {
+                        snprintf(buffer, sizeof(buffer), "%f", V_value2[i]);
+                        if ((ret = sendMessage(s_local, buffer, strlen(buffer) + 1)) != 0) {
+                            goto cleanup;
                         }
-                        
-                        // Enviar value3.x
-                        snprintf(buffer, sizeof(buffer), "%d", value3.x);
-                        if ((ret = sendMessage(s_local, buffer, strlen(buffer) + 1)) != 0) goto cleanup;
-                        
-                        // Enviar value3.y
-                        snprintf(buffer, sizeof(buffer), "%d", value3.y);
-                        if ((ret = sendMessage(s_local, buffer, strlen(buffer) + 1)) != 0) goto cleanup;
                     }
+                    
+                    // Enviar value3.x
+                    snprintf(buffer, sizeof(buffer), "%d", value3.x);
+                    if ((ret = sendMessage(s_local, buffer, strlen(buffer) + 1)) != 0) goto cleanup;
+                    
+                    // Enviar value3.y
+                    snprintf(buffer, sizeof(buffer), "%d", value3.y);
+                    if ((ret = sendMessage(s_local, buffer, strlen(buffer) + 1)) != 0) goto cleanup;
                     break;
             }
             break;

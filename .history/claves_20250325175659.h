@@ -1,7 +1,38 @@
 #ifndef CLAVES_H
 #define CLAVES_H
 
-#include "includes_y_defines.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <errno.h>
+#include <pthread.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <sys/types.h>
+#include <netdb.h>
+#include <limits.h>
+#include <float.h>
+
+//Definir constantes globales que se van a utilizar con frecuencia
+#define DESTROY '0'
+#define DELETE_KEY '1'
+#define EXIST '2'
+#define SET_VALUE '3'
+#define GET_VALUE '4'
+#define MODIFY_VALUE '5'
+#define ERROR_TUPLAS -1
+#define ERROR_COMMUNICATION -2
+
+// Definir prototipos de funciones para recibir y mandar mensajes
+ssize_t readLine(int socket, void *buffer, size_t n);
+int sendMessage(int socket, char * buffer, int len);
+int recvMessage(int socket, char * buffer, int len);
+// Definir funciones para convertir strings a números
+int strtol_handling(char *str, int *result);
+double strtod_handling(char *str, double *result);
+// Definir función para leer números de un socket
+int read_num_from_socket(int s_local, char * buffer, int* num);
 
 //Definir estructuras
 struct Coord {

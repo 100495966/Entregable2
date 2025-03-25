@@ -43,7 +43,7 @@ all: $(LIBRARY_NAME) $(SERVER_EXEC) $(CLIENT_EXEC1) $(CLIENT_EXEC2) $(CLIENT_EXE
 $(LIBRARY_NAME): $(PROXY_OBJ)
 	@echo "Creando la biblioteca dinámica $(LIBRARY_NAME)"
 	@mkdir -p $(BIN_DIR)
-	$(CC) -shared -o $(BIN_DIR)/$(LIBRARY_NAME) $(PROXY_OBJ) $(LDFLAGS)
+	$(CC) -shared -o $(BIN_DIR)/(LIBRARY_NAME) $(PROXY_OBJ) $(LDFLAGS)
 
 
 $(SERVER_EXEC): $(CLAVES_OBJ) $(SERVER_OBJ)

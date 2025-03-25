@@ -107,7 +107,7 @@ int set_value(int key, char *value1, int N_value2, double *V_value2, struct Coor
 }
 
 int get_value(int key, char *value1, int *N_value2, double *V_value2, struct Coord *value3){
-    if (value1 == NULL || N_value2 == NULL || V_value2 == NULL || value3 == NULL) {
+    if (value1 == NULL || N_value2 == NULL || V_value2 == NULL || value3 == NULL || exist(key) == -1) {
         return ERROR_TUPLAS;
     }        
     pthread_mutex_lock(&mutex1);
