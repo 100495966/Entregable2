@@ -1,9 +1,10 @@
 #include "claves.h"
 #include "servidor_y_proxy.h"
 
+//Esta función se encarga de conectar al cliente con el servidor
 int connectToServer(int * s){
     char * ip_tuplas, *port_tuplas;
-
+    //Lee las variables de su entorno
     if ((ip_tuplas = getenv("IP_TUPLAS")) == NULL){
         perror("Variable de entorno \"IP_TUPLAS\" no ha sido definida\n");
         return ERROR_COMMUNICATION;
@@ -13,26 +14,34 @@ int connectToServer(int * s){
         return ERROR_COMMUNICATION;
     }
 
-    //printf("CLIENTE: Conectando a IP: %s, Puerto: %s\n", ip_tuplas, port_tuplas);
+    printf("CLIENTE: Conectando a IP: %s, Puerto: %s\n", ip_tuplas, port_tuplas);
     
     struct sockaddr_in server_addr;
     struct hostent * hp;
 
+    // Crea el socket tipo TCP
     if ((*s = socket (AF_INET, SOCK_STREAM, 0) ) < 0) { 
         perror("CLIENTE: Error en el socket");
         return ERROR_COMMUNICATION;
     }
     
+    // Inicializa la estructura de dirección del servidor en cero
     memset((char *)&server_addr, 0, sizeof(server_addr));
     server_addr.sin_family = AF_INET;
     server_addr.sin_port = htons(atoi(port_tuplas));
+
+    // Obtener la dirección IP del host a partir del nombre
+
     if ((hp = gethostbyname(ip_tuplas)) == NULL) {
         perror("CLIENTE: Error al resolver el nombre de host");
         close(*s);
         return ERROR_COMMUNICATION;
     }
+
+    // Copiar la IP obtenida en la estructura de dirección del servidor
     memcpy(&server_addr.sin_addr, hp->h_addr_list[0], hp->h_length);
 
+    // Intenta conectarse al servidor remoto
     if (connect(*s, (struct sockaddr *) &server_addr, sizeof(server_addr)) != 0){
         perror("CLIENTE: Error al establecer conexión con el servidor");
         // Cerrar y eliminar el socket
@@ -40,7 +49,8 @@ int connectToServer(int * s){
         // Devolver el estado de la acción realizada por el servidor
         return ERROR_COMMUNICATION;
     }
-
+    
+    printf("CLIENTE: Conexión establecida exitosamente con el servidor.\n");
     return 0;
 }
 
@@ -63,6 +73,7 @@ static int sendRequestToServer(
     //printf("CLIENTE: conexión exitosa con el servidor\n");
 
     // Enviar acción a realizar
+    printf("CLIENTE: Enviando acción: %c\n", action);
     if ((ret = sendMessage(sc, &action, 1)) != 0) goto cleanup;
     
     if (key != NULL){
@@ -101,6 +112,7 @@ static int sendRequestToServer(
     // Recibir la respuesta
     if ((ret = recvMessage(sc, buffer, 2)) != 0) goto cleanup;
     if ((strtol_handling(buffer, &ret)) != 0) goto cleanup;
+    printf("CLIENTE: Respuesta del servidor: %d\n", ret);
 
     cleanup:
         // Cerrar y eliminar el socket
@@ -204,6 +216,9 @@ int get_value(int key, char *value1, int *N_value2, double *V_value2, struct Coo
         // Leer value3.y
         if ((ret = read_num_from_socket(s, buffer, &(value3->y))) != 0) goto cleanup_get_value;
 
+        //Imprimir valores
+        printf("CLIENTE: value1 recibido: %s | N_value2: %d | V_value2[%d]: %f | value3: (%d, %d)\n",
+       value1, *N_value2, i, V_value2[i], value3->x, value3->y);
     }
     
     cleanup_get_value:

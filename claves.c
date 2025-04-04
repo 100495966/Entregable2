@@ -19,7 +19,7 @@ typedef struct Tupla {
 //Puntero a la lista de tuplas
 static Tupla *head  = NULL;
 
-//Implementación de las funciones
+//Implementación de las funciones (se mantiene igual)
 
 int destroy() {
     pthread_mutex_lock(&mutex1);

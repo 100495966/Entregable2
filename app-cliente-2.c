@@ -13,6 +13,7 @@ void print_vector(double *vector, int size) {
     printf("]\n");
 }
 
+// Este cliente verifica escenario de manejar datos insertados por otros clientes
 int main() {
 
     sleep(2);

@@ -6,6 +6,7 @@ pthread_mutex_t mutex2;
 pthread_cond_t cond;
 int busy;
 
+// Función ejecutado por cada hilo para atender petición del cliente
 void * SendResponse(void * sc){
     int s_local;
 
@@ -115,6 +116,8 @@ void * SendResponse(void * sc){
             if ((ret = read_num_from_socket(s_local, buffer, &value3.x)) != 0) goto cleanup;
             if ((ret = read_num_from_socket(s_local, buffer, &value3.y)) != 0) goto cleanup;
 
+            printf("SERVIDOR: SET/MODIFY_VALUE recibido - clave: %d, value1: %s, N_value2: %d, value3: (%d, %d)\n", key, value1, N_value2, value3.x, value3.y);
+
             switch (action){
                 case SET_VALUE:
                     ret = set_value(key, value1, N_value2, V_value2, value3);
@@ -130,6 +133,7 @@ void * SendResponse(void * sc){
             goto cleanup;
     }
 
+    // Enviar resultado de la operación
     snprintf(buffer, sizeof(buffer), "%d", ret);
     if ((ret = sendMessage(s_local, buffer, strlen(buffer) + 1)) != 0) goto cleanup;
 
@@ -163,6 +167,7 @@ int main(int argc, char * argv[]) {
     socklen_t size;
     int ss, sc;
 
+    // Crear socket del servidor
     if ((ss = socket (AF_INET, SOCK_STREAM, 0) ) < 0) { 
         perror("SERVIDOR: Error en el socket\n");
         goto cleanup_servidor;
@@ -173,6 +178,7 @@ int main(int argc, char * argv[]) {
         goto cleanup_servidor;
     }
 
+    // Asignar dirección IP y puerto
     memset((char *)&server_addr, 0, sizeof(server_addr));
     server_addr.sin_family = AF_INET;
     server_addr.sin_port = htons(atoi(argv[1]));
@@ -182,6 +188,7 @@ int main(int argc, char * argv[]) {
         goto cleanup_servidor;
     }
 
+    // Escuchar conexiones entrantes
     if (listen(ss, SOMAXCONN) != 0){
         perror("SERVIDOR: Error al habilitar el socket para recibir conexiones\n");
         goto cleanup_servidor;
@@ -210,6 +217,7 @@ int main(int argc, char * argv[]) {
             goto cleanup_servidor;
         }
 
+        //Crea hilo para manejar la conexión
         pthread_t thread_id;
         if (pthread_create(&thread_id, &thread_attr, SendResponse, (void*) &sc) != 0) {
             perror("SERVIDOR: Error al crear el hilo\n");

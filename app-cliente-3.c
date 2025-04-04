@@ -13,6 +13,7 @@ void print_vector(double *vector, int size) {
     printf("]\n");
 }
 
+// Este cliente se encarga de probar escenarios que deberían dar error, y prueba la concurrencia
 int main() {
     //Esto debería dar un error, al estar ya subida por el otro cliente
     struct Coord coord1 = {4, 7};

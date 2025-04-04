@@ -1,6 +1,8 @@
 #include "includes_y_defines.h"
 
 // Definir funciones para mandar y recibir mensajes
+
+// Función para leer una línea desde un socket
 ssize_t readLine(int socket, char * buffer, size_t n)
 {
     if (n <= 0 || buffer == NULL) {
@@ -16,7 +18,7 @@ ssize_t readLine(int socket, char * buffer, size_t n)
     char ch;
 
     for (;;) {
-        // Leer un byte
+        // Leer un byte del socket
         numRead = read(socket, &ch, 1);   
         if (numRead == -1) {
             // reiniciar read al ser interrumpido
@@ -51,6 +53,7 @@ ssize_t readLine(int socket, char * buffer, size_t n)
     return totRead;
 }
 
+// Función para enviar un mensaje carácter por carácter
 int sendMessage(int socket, char * buffer, int len){
     int r;
     int l = len;
@@ -71,9 +74,11 @@ int sendMessage(int socket, char * buffer, int len){
 
 }
 
+// Función para recibir un mensaje carácter por carácter
 int recvMessage(int socket, char * buffer, int len){
     int r;
     int l = len;
+    // leer los datos byte a byte
     do {
         r = read(socket, buffer, 1);
         l -= r;
@@ -96,6 +101,7 @@ int strtol_handling(char * str, int * result){
     long int n;
     errno = 0;
     n = (int) strtol(str, &endPtr, 10);
+    // Manejo de errores
     if ((errno == ERANGE && (n == LONG_MAX || n == LONG_MIN)) || (errno != 0 && n == 0)){
         perror("La función strtol ha fallado");
         return ERROR_COMMUNICATION;
@@ -115,6 +121,7 @@ int strtol_handling(char * str, int * result){
     return 0;
 }
 
+// Conversión de string a doublee usando strtod
 double strtod_handling(char * str, double * result){
     char * endPtr;
     double n;

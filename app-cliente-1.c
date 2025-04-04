@@ -13,6 +13,7 @@ void print_vector(double *vector, int size) {
     printf("]\n");
 }
 
+// Este cliente se encarga de probar las funciones en escenarios en los que deberían funcionar
 int main() {
 
     // Eliminar todos los valores previos
