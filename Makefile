@@ -11,83 +11,65 @@ CLIENT_EXEC2 = app-cliente-2
 CLIENT_EXEC3 = app-cliente-3
 CLIENT_EXEC4 = app-cliente-4
 
-# Directorios
-SRC_DIR = .
-OBJ_DIR = obj
-BIN_DIR = bin
-
 # Archivos fuente
-CLAVES_SRC = $(SRC_DIR)/claves.c
-SERVER_SRC = $(SRC_DIR)/servidor-sock.c
-PROXY_SRC = $(SRC_DIR)/proxy-sock.c
-CLIENT_SRC1 = $(SRC_DIR)/app-cliente-1.c
-CLIENT_SRC2 = $(SRC_DIR)/app-cliente-2.c
-CLIENT_SRC3 = $(SRC_DIR)/app-cliente-3.c
-CLIENT_SRC4 = $(SRC_DIR)/app-cliente-4.c
+CLAVES_SRC = claves.c
+SERVER_SRC = servidor-sock.c
+PROXY_SRC = proxy-sock.c
+CLIENT_SRC1 = app-cliente-1.c
+CLIENT_SRC2 = app-cliente-2.c
+CLIENT_SRC3 = app-cliente-3.c
+CLIENT_SRC4 = app-cliente-4.c
 
 # Headers
-HEADER_SRC = $(SRC_DIR)/claves.h
-INCL_DEF_SRC = $(SRC_DIR)/includes_y_defines.h
-SERV_PROX_SRC = $(SRC_DIR)/servidor_y_proxy.h
+HEADER_SRC = claves.h
+INCL_DEF_SRC = includes_y_defines.h
+SERV_PROX_SRC = servidor_y_proxy.h
 
 # Archivos objeto
-CLAVES_OBJ = $(OBJ_DIR)/claves.o
-SERVER_OBJ = $(OBJ_DIR)/servidor-sock.o
-PROXY_OBJ = $(OBJ_DIR)/proxy-sock.o
-CLIENT_OBJ1 = $(OBJ_DIR)/app-cliente-1.o
-CLIENT_OBJ2 = $(OBJ_DIR)/app-cliente-2.o
-CLIENT_OBJ3 = $(OBJ_DIR)/app-cliente-3.o
-CLIENT_OBJ4 = $(OBJ_DIR)/app-cliente-4.o
+CLAVES_OBJ = claves.o
+SERVER_OBJ = servidor-sock.o
+PROXY_OBJ = proxy-sock.o
+CLIENT_OBJ1 = app-cliente-1.o
+CLIENT_OBJ2 = app-cliente-2.o
+CLIENT_OBJ3 = app-cliente-3.o
+CLIENT_OBJ4 = app-cliente-4.o
 
 # Regla principal
-all: $(LIBRARY_NAME) $(SERVER_EXEC) $(CLIENT_EXEC1) $(CLIENT_EXEC2) $(CLIENT_EXEC4) 
+all: $(LIBRARY_NAME) $(SERVER_EXEC) $(CLIENT_EXEC1) $(CLIENT_EXEC2) $(CLIENT_EXEC3) $(CLIENT_EXEC4) 
 
 # Crear la biblioteca dinámica
 $(LIBRARY_NAME): $(PROXY_OBJ)
 	@echo "Creando la biblioteca dinámica $(LIBRARY_NAME)"
-	@mkdir -p $(BIN_DIR)
-	$(CC) -shared -o $(BIN_DIR)/$(LIBRARY_NAME) $(PROXY_OBJ) $(LDFLAGS)
-
+	$(CC) -shared -o $(LIBRARY_NAME) $(PROXY_OBJ) $(LDFLAGS)
 
 $(SERVER_EXEC): $(CLAVES_OBJ) $(SERVER_OBJ)
-	@mkdir -p $(BIN_DIR)
 	@echo "Compilando el servidor $(SERVER_EXEC)"
-	$(CC) -o $(BIN_DIR)/$(SERVER_EXEC) $(CLAVES_OBJ) $(SERVER_OBJ) $(LDFLAGS)
+	$(CC) -o $(SERVER_EXEC) $(CLAVES_OBJ) $(SERVER_OBJ) $(LDFLAGS)
 
 # Compilar los clientes
 $(CLIENT_EXEC1): $(CLIENT_OBJ1) $(LIBRARY_NAME)
 	@echo "Compilando el cliente $(CLIENT_EXEC1)"
-	@mkdir -p $(BIN_DIR)
-	$(CC) -o $(BIN_DIR)/$(CLIENT_EXEC1) $(CLIENT_OBJ1) -L$(BIN_DIR) -lclaves $(LDFLAGS) -Wl,-rpath,$(BIN_DIR)
+	$(CC) -o $(CLIENT_EXEC1) $(CLIENT_OBJ1) -L. -lclaves $(LDFLAGS) -Wl,-rpath,.
 
 $(CLIENT_EXEC2): $(CLIENT_OBJ2) $(LIBRARY_NAME)
 	@echo "Compilando el cliente $(CLIENT_EXEC2)"
-	@mkdir -p $(BIN_DIR)
-	$(CC) -o $(BIN_DIR)/$(CLIENT_EXEC2) $(CLIENT_OBJ2) -L$(BIN_DIR) -lclaves $(LDFLAGS) -Wl,-rpath,$(BIN_DIR)
+	$(CC) -o $(CLIENT_EXEC2) $(CLIENT_OBJ2) -L. -lclaves $(LDFLAGS) -Wl,-rpath,.
 
 $(CLIENT_EXEC3): $(CLIENT_OBJ3) $(LIBRARY_NAME)
 	@echo "Compilando el cliente $(CLIENT_EXEC3)"
-	@mkdir -p $(BIN_DIR)
-	$(CC) -o $(BIN_DIR)/$(CLIENT_EXEC3) $(CLIENT_OBJ3) -L$(BIN_DIR) -lclaves $(LDFLAGS) -Wl,-rpath,$(BIN_DIR)
+	$(CC) -o $(CLIENT_EXEC3) $(CLIENT_OBJ3) -L. -lclaves $(LDFLAGS) -Wl,-rpath,.
 
 $(CLIENT_EXEC4): $(CLIENT_OBJ4) $(LIBRARY_NAME)
 	@echo "Compilando el cliente $(CLIENT_EXEC4)"
-	@mkdir -p $(BIN_DIR)
-	$(CC) -o $(BIN_DIR)/$(CLIENT_EXEC4) $(CLIENT_OBJ4) -L$(BIN_DIR) -lclaves $(LDFLAGS) -Wl,-rpath,$(BIN_DIR)
+	$(CC) -o $(CLIENT_EXEC4) $(CLIENT_OBJ4) -L. -lclaves $(LDFLAGS) -Wl,-rpath,.
 
 # Compilación de los archivos .c a .o
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c $(HEADER_SRC) $(INCL_DEF_SRC) $(SERV_PROX_SRC)
-	@mkdir -p $(OBJ_DIR)
+%.o: %.c $(HEADER_SRC) $(INCL_DEF_SRC) $(SERV_PROX_SRC)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 # Limpiar los archivos generados
 clean:
 	@echo "Limpiando los archivos generados"
-	rm -rf $(OBJ_DIR) $(BIN_DIR)
+	rm -f *.o $(SERVER_EXEC) $(CLIENT_EXEC1) $(CLIENT_EXEC2) $(CLIENT_EXEC3) $(CLIENT_EXEC4) $(LIBRARY_NAME)
 
-# Eliminar todo, incluyendo los archivos generados
-distclean: clean
-	@echo "Limpiando todo"
-	rm -f $(BIN_DIR)/$(LIBRARY_NAME)
-
-.PHONY: all clean distclean
+.PHONY: all clean

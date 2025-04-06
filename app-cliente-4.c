@@ -15,7 +15,7 @@ void generar_vector(double *vec, int n) {
 // Este cliente va a probar el sistema con una cantidad alta de tuplas
 int main() {
 
-    sleep(5); // Se probará este cliente por separado a los demás, para no afectar el desempeño de los otros
+    sleep(10); // Se probará este cliente por separado a los demás, para no afectar el desempeño de los otros
     printf("ClienteBulk: Insertando %d claves...\n", NUM_CLAVES);
 
     for (int i = 10000; i < 10000 + NUM_CLAVES; i++) {

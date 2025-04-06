@@ -13,10 +13,10 @@ void print_vector(double *vector, int size) {
     printf("]\n");
 }
 
-// Este cliente verifica escenario de manejar datos insertados por otros clientes
+// Este cliente verifica escenarios de manejar datos insertados por otros clientes
 int main() {
 
-    sleep(2);
+    sleep(5);
   
     // Insertar valores de prueba
     printf("\nCliente2: Insertando claves...\n");
