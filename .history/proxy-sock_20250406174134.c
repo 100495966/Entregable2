@@ -217,7 +217,7 @@ int get_value(int key, char *value1, int *N_value2, double *V_value2, struct Coo
         if ((ret = read_num_from_socket(s, buffer, &(value3->y))) != 0) goto cleanup_get_value;
 
         //Imprimir valores
-        printf("CLIENTE: valores recibidos\n");
+        printf("CLIENTE: valores recibidos");
     }
     
     cleanup_get_value:

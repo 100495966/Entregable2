@@ -40,7 +40,7 @@ CLIENT_OBJ3 = $(OBJ_DIR)/app-cliente-3.o
 CLIENT_OBJ4 = $(OBJ_DIR)/app-cliente-4.o
 
 # Regla principal
-all: $(LIBRARY_NAME) $(SERVER_EXEC) $(CLIENT_EXEC1) $(CLIENT_EXEC2) $(CLIENT_EXEC4) 
+all: $(LIBRARY_NAME) $(SERVER_EXEC) $(CLIENT_EXEC1) $(CLIENT_EXEC2) $(CLIENT_EXEC3)
 
 # Crear la biblioteca dinámica
 $(LIBRARY_NAME): $(PROXY_OBJ)
